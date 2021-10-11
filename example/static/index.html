@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+    <head>
+        <title>Web Summarizer - websum</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <div style="width: 50%; margin: auto;">
+            <h1>Web Summarizer - websum</h1>
+            <form id="summarize">
+                <input type="text" id="url" />
+                <input type="submit" />
+            </form>
+            <div>
+                <table>
+                    <tr>
+                        <td>HTML Version: </td>
+                        <td id="version">-</td>
+                    </tr>
+                    <tr>
+                        <td>Page Title: </td>
+                        <td id="title">-</td>
+                    </tr>
+                    <tr>
+                        <td>Contains Login: </td>
+                        <td id="login">-</td>
+                    </tr>
+                    <tr>
+                        <td>Headings: </td>
+                        <td><ul id="headings"></ul></td>
+                    </tr>
+                    <tr>
+                        <td>Links: </td>
+                        <td><ul id="links"></ul></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </body>
+    <script>
+        $("#summarize").submit(function( event ) {
+            event.preventDefault();
+
+            $.post("/summarize", {url: $("#url").val()}, function(result){
+                var res = $.parseJSON(result);
+                $("#version").html(res.html_version);
+                $("#title").html(res.title);
+                $("#headings").empty();
+                $.each(res.headings_count, function(key, value) {
+                    $("#headings").append("<li>" + key + ": " + value + "</li>");
+                });
+                if (res.contain_login == true) {
+                    $("#login").html("Yes");
+                } else {
+                    $("#login").html("No");
+                }
+                $("#links").empty();
+                $.each(res.links_count, function(key, value) {
+                    $("#links").append("<li>" + key + ": " + value + "</li>");
+                });
+            });
+        });
+    </script>
+</html>
